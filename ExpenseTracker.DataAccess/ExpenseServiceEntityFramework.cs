@@ -7,23 +7,20 @@ namespace ExpenseTracker.DataAccess
 {
 	public class ExpenseServiceEntityFramework : IExpenseService, IExpenseServiceEntityFramework
 	{
-		//private readonly ILogger _logger;
+		private readonly ILogger _logger;
 		private readonly ExpenseTrackerDbContext _dbContext;
 		private readonly IMapper _mapper;
 
-		public ExpenseServiceEntityFramework(/*ILogger logger,*/ ExpenseTrackerDbContext dbContext)
+		public ExpenseServiceEntityFramework(ILogger<ExpenseServiceEntityFramework> logger, ExpenseTrackerDbContext dbContext, IMapper mapper)
 		{
-			//this._logger = logger;
+			_logger = logger;
 			this._dbContext = dbContext;
-			var mapperConfig = new MapperConfiguration(m =>
-			{
-				m.AddProfile(new Mapper.MappingProfile());
-			});
-			_mapper = mapperConfig.CreateMapper();
+			_mapper = mapper;
 
 		}
 		public List<Expense> GetExpenses()
 		{
+			_logger.LogInformation("Getting expenses...");
 			return _dbContext.Expenses.Select(e => _mapper.Map<Expense>(e)).ToList();
 		}
 
@@ -32,7 +29,7 @@ namespace ExpenseTracker.DataAccess
 			var exp = _dbContext.Expenses.Where(x => x.Id == id).Select(e => _mapper.Map<Expense>(e)).FirstOrDefault();
 			if (exp == null)
 			{
-				//_logger.LogInformation("Expense with id \"{id}\" was not found.", id);
+				_logger.LogInformation("Expense with id \"{id}\" was not found.", id);
 			}
 
 			return exp;
